@@ -1,0 +1,1702 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王府装饰设计有限公司 - 活动积分管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #1e88e5 0%, #0d47a1 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .clock {
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-score {
+            background: linear-gradient(90deg, #9c27b0 0%, #673ab7 100%);
+            color: white;
+        }
+        
+        .btn-redeem {
+            background: linear-gradient(90deg, #e91e63 0%, #c2185b 100%);
+            color: white;
+        }
+        
+        .btn-rank {
+            background: linear-gradient(90deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+        }
+        
+        .btn-call {
+            background: linear-gradient(90deg, #2196F3 0%, #0D47A1 100%);
+            color: white;
+        }
+        
+        .btn-visit {
+            background: linear-gradient(90deg, #FF9800 0%, #EF6C00 100%);
+            color: white;
+        }
+        
+        .btn-contract {
+            background: linear-gradient(90deg, #009688 0%, #00796b 100%);
+            color: white;
+        }
+        
+        .btn-deduct {
+            background: linear-gradient(90deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f0f8ff;
+            padding: 0 20px;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            color: #1e88e5;
+            border-bottom: 3px solid #1e88e5;
+            background: rgba(30, 136, 229, 0.05);
+        }
+        
+        .tab[data-tab="contract"] {
+            background: linear-gradient(90deg, #009688 0%, #00796b 100%);
+            color: white;
+        }
+        
+        .tab[data-tab="contract"].active {
+            color: #009688;
+            border-bottom: 3px solid #009688;
+            background: rgba(0, 150, 136, 0.05);
+        }
+        
+        .tab-content {
+            padding: 20px;
+            min-height: 500px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .ranking-table th {
+            background: linear-gradient(90deg, #1e88e5 0%, #0d47a1 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .ranking-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .ranking-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .ranking-table tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .ranking-table .rank-1 {
+            background: linear-gradient(90deg, #fff8e1 0%, #ffecb3 100%);
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .ranking-table .rank-2 {
+            background: linear-gradient(90deg, #f5f5f5 0%, #e0e0e0 100%);
+            font-size: 16px;
+        }
+        
+        .ranking-table .rank-3 {
+            background: linear-gradient(90deg, #ffecb3 0%, #ffd54f 100%);
+            font-size: 16px;
+        }
+        
+        .medal {
+            font-size: 24px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .chart-container {
+            margin-top: 30px;
+            position: relative;
+            height: 400px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #1e88e5;
+            color: white;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            background: linear-gradient(90deg, #1e88e5 0%, #0d47a1 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #444;
+        }
+        
+        .form-group select, 
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .rules {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .rules h3 {
+            margin-bottom: 10px;
+            color: #0d47a1;
+        }
+        
+        .rules ul {
+            padding-left: 20px;
+        }
+        
+        .rules li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: #4caf50;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        .deduct-reason {
+            margin-top: 15px;
+        }
+        
+        .password-field {
+            margin-top: 15px;
+        }
+        
+        .clock-container {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stats-summary {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            min-width: 200px;
+        }
+        
+        .stat-card h3 {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e88e5;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                flex: 1;
+                min-width: 140px;
+                justify-content: center;
+            }
+            
+            .stats-summary {
+                flex-wrap: wrap;
+            }
+            
+            .stat-card {
+                min-width: 150px;
+                margin: 0 10px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="title">狂欢一（夏），优惠当'燃' 活动积分排行榜</div>
+            <div class="clock" id="clock">2023-07-23 14:30:45</div>
+        </header>
+        
+        <div class="stats-summary">
+            <div class="stat-card">
+                <h3>总进店量</h3>
+                <div class="value" id="totalVisits">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>总签单量</h3>
+                <div class="value" id="totalContracts">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>总积分</h3>
+                <div class="value" id="totalScores">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>总金币</h3>
+                <div class="value" id="totalCoins">0</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="btn-group">
+                <button class="btn btn-rank" onclick="switchTab('score')">
+                    <i class="fas fa-trophy"></i> 积分排行榜
+                </button>
+                <button class="btn btn-call" onclick="switchTab('call')">
+                    <i class="fas fa-phone"></i> 电话量排行榜
+                </button>
+                <button class="btn btn-visit" onclick="switchTab('visit')">
+                    <i class="fas fa-store"></i> 进店量排行榜
+                </button>
+                <button class="btn btn-contract" onclick="switchTab('contract')">
+                    <i class="fas fa-file-contract"></i> 签单排行榜
+                </button>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-score" onclick="openAddScoreModal('add')">
+                    <i class="fas fa-plus-circle"></i> 添加积分
+                </button>
+                <button class="btn btn-deduct" onclick="openAddScoreModal('deduct')">
+                    <i class="fas fa-minus-circle"></i> 扣除积分
+                </button>
+                <button class="btn btn-redeem" onclick="openRedeemModal()">
+                    <i class="fas fa-coins"></i> 兑换金币
+                </button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="score">积分排行榜</div>
+            <div class="tab" data-tab="call">电话量排行榜</div>
+            <div class="tab" data-tab="visit">进店量排行榜</div>
+            <div class="tab" data-tab="contract">签单排行榜</div>
+        </div>
+        
+        <div class="tab-content">
+            <!-- 积分排行榜 -->
+            <div class="tab-pane active" id="score-pane">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">排名</th>
+                            <th width="35%">姓名</th>
+                            <th width="20%">积分</th>
+                            <th width="20%">金币</th>
+                        </tr>
+                    </thead>
+                    <tbody id="score-ranking">
+                        <!-- 动态生成 -->
+                    </tbody>
+                </table>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-rank" onclick="exportChart('score')">
+                        <i class="fas fa-download"></i> 导出积分排行榜图片
+                    </button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="score-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- 电话量排行榜 -->
+            <div class="tab-pane" id="call-pane">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">排名</th>
+                            <th width="35%">姓名</th>
+                            <th width="50%">电话量</th>
+                        </tr>
+                    </thead>
+                    <tbody id="call-ranking">
+                        <!-- 动态生成 -->
+                    </tbody>
+                </table>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-call" onclick="exportChart('call')">
+                        <i class="fas fa-download"></i> 导出电话量排行榜图片
+                    </button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="call-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- 进店量排行榜 -->
+            <div class="tab-pane" id="visit-pane">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">排名</th>
+                            <th width="25%">姓名</th>
+                            <th width="20%">总进店量</th>
+                            <th width="20%">一访次数</th>
+                            <th width="20%">二访次数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visit-ranking">
+                        <!-- 动态生成 -->
+                    </tbody>
+                </table>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-visit" onclick="exportChart('visit')">
+                        <i class="fas fa-download"></i> 导出进店量排行榜图片
+                    </button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="visit-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- 签单排行榜 -->
+            <div class="tab-pane" id="contract-pane">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">排名</th>
+                            <th width="35%">姓名</th>
+                            <th width="25%">签单总数</th>
+                            <th width="25%">金币</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contract-ranking">
+                        <!-- 动态生成 -->
+                    </tbody>
+                </table>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-contract" onclick="exportChart('contract')">
+                        <i class="fas fa-download"></i> 导出签单排行榜图片
+                    </button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="contract-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="rules">
+            <h3><i class="fas fa-info-circle"></i> 积分规则说明</h3>
+            <ul>
+                <li><strong>进店一访客户</strong>：+30 分</li>
+                <li><strong>二访客户</strong>：+10 分</li>
+                <li><strong>来源方签单</strong>：+300 分</li>
+                <li><strong>签单手签单</strong>：+200 分</li>
+                <li><strong>抖音播放量最高</strong>：每日 +10 分</li>
+                <li><strong>单日最高积分</strong>：额外 +5 分</li>
+                <li><strong>积分兑换</strong>：1积分 = 1金币 = 1人民币</li>
+                <li><strong>兑换规则</strong>：兑换时只减少金币，不影响积分。金币不足100不可兑换，超过550分以上可享受1:1.1倍兑换金币</li>
+            </ul>
+        </div>
+        
+        <footer>
+            王府装饰设计有限公司 © 2023 | 活动积分管理系统 v2.0
+        </footer>
+    </div>
+    
+    <!-- 添加/扣除积分模态框 -->
+    <div class="modal" id="addScoreModal">
+        <div class="modal-content">
+            <div class="modal-header" id="scoreModalHeader">添加积分</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="employee">选择员工</label>
+                    <select id="employee">
+                        <option value="王芳">王芳</option>
+                        <option value="杨蓉">杨蓉</option>
+                        <option value="周国">周国</option>
+                        <option value="黄明明">黄明明</option>
+                        <option value="刘铁枚">刘铁枚</option>
+                        <option value="黄远振">黄远振</option>
+                        <option value="黄甜甜">黄甜甜</option>
+                        <option value="孙文霞">孙文霞</option>
+                        <option value="贺秋菊">贺秋菊</option>
+                        <option value="黄娜">黄娜</option>
+                        <option value="刘程">刘程</option>
+                        <option value="王锦泉">王锦泉</option>
+                        <option value="田永贤">田永贤</option>
+                        <option value="黄晓忠">黄晓忠</option>
+                        <option value="舒达勇">舒达勇</option>
+                        <option value="夏修前">夏修前</option>
+                        <option value="黄春">黄春</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="scoreType">积分类型</label>
+                    <select id="scoreType">
+                        <option value="一访">一访进店</option>
+                        <option value="二访">二访进店</option>
+                        <option value="来源方签单">来源方签单</option>
+                        <option value="签单手签单">签单手签单</option>
+                        <option value="抖音播放量">抖音播放量</option>
+                        <option value="单日最高积分">单日最高积分</option>
+                        <option value="电话量">电话量</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity">数量</label>
+                    <input type="number" id="quantity" min="-100" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="scoreDate">日期</label>
+                    <input type="date" id="scoreDate">
+                </div>
+                
+                <div class="password-field" id="passwordField">
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" id="password" placeholder="请输入密码">
+                    </div>
+                </div>
+                
+                <div class="deduct-reason" id="deductReasonGroup">
+                    <div class="form-group">
+                        <label for="reason">扣除原因</label>
+                        <textarea id="reason" placeholder="请详细说明扣除积分的原因..." rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div class="rules">
+                    <h3><i class="fas fa-exclamation-circle"></i> 操作说明</h3>
+                    <p>只有运营总监可以添加或扣除积分，请确保输入正确的密码。</p>
+                    <p>扣除积分需要填写详细原因，系统会自动记录操作日志。</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('addScoreModal')" style="background: #f5f5f5;">取消</button>
+                <button class="btn btn-score" id="scoreActionBtn" onclick="addScore()">确认操作</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 兑换金币模态框 -->
+    <div class="modal" id="redeemModal">
+        <div class="modal-content">
+            <div class="modal-header">兑换金币</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="redeemEmployee">选择员工</label>
+                    <select id="redeemEmployee">
+                        <option value="王芳">王芳</option>
+                        <option value="杨蓉">杨蓉</option>
+                        <option value="周国">周国</option>
+                        <option value="黄明明">黄明明</option>
+                        <option value="刘铁枚">刘铁枚</option>
+                        <option value="黄远振">黄远振</option>
+                        <option value="黄甜甜">黄甜甜</option>
+                        <option value="孙文霞">孙文霞</option>
+                        <option value="贺秋菊">贺秋菊</option>
+                        <option value="黄娜">黄娜</option>
+                        <option value="刘程">刘程</option>
+                        <option value="王锦泉">王锦泉</option>
+                        <option value="田永贤">田永贤</option>
+                        <option value="黄晓忠">黄晓忠</option>
+                        <option value="舒达勇">舒达勇</option>
+                        <option value="夏修前">夏修前</option>
+                        <option value="黄春">黄春</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">兑换金币数量</label>
+                    <input type="number" id="amount" min="1" placeholder="请输入兑换数量">
+                </div>
+                
+                <div class="form-group">
+                    <label for="redeemPassword">密码</label>
+                    <input type="password" id="redeemPassword" placeholder="请输入密码">
+                </div>
+                
+                <div class="rules">
+                    <h3><i class="fas fa-exclamation-circle"></i> 兑换规则</h3>
+                    <ul>
+                        <li>1积分 = 1金币 = 1人民币</li>
+                        <li>兑换时只减少金币，不影响积分</li>
+                        <li>兑换数量不能超过当前金币余额</li>
+                        <li>金币不足100不可兑换</li>
+                        <li>超过550分以上可享受1:1.1倍兑换金币</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('redeemModal')" style="background: #f5f5f5;">取消</button>
+                <button class="btn btn-redeem" onclick="redeemCoins()">确认兑换</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 操作通知 -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">操作成功！</span>
+    </div>
+
+    <script>
+        // 员工数据
+        const employees = [
+            "王芳", "杨蓉", "周国", "黄明明", "刘铁枚", "黄远振", "黄甜甜", 
+            "孙文霞", "贺秋菊", "黄娜", "刘程", "王锦泉", "田永贤", 
+            "黄晓忠", "舒达勇", "夏修前", "黄春"
+        ];
+        
+        // 初始数据
+        let employeeData = {};
+        let currentActionType = "add"; // 当前操作类型：add 或 deduct
+        let lastPasswordTime = 0; // 上次输入密码的时间
+        
+        // 积分规则
+        const scoreRules = {
+            "一访": 30,
+            "二访": 10,
+            "来源方签单": 300,
+            "签单手签单": 200,
+            "抖音播放量": 10,
+            "单日最高积分": 5
+        };
+        
+        // 密码
+        const PASSWORD = "2403";
+        
+        // 图表实例
+        let scoreChart, callChart, visitChart, contractChart;
+        
+        // 操作日志
+        let operationLogs = [];
+        
+        // 初始化数据
+        function initData() {
+            const savedData = localStorage.getItem('employeeData');
+            if (savedData) {
+                try {
+                    employeeData = JSON.parse(savedData);
+                } catch (e) {
+                    console.error("解析员工数据失败，使用初始数据", e);
+                    resetToInitialData();
+                }
+            } else {
+                resetToInitialData();
+            }
+            
+            // 初始化操作日志
+            const savedLogs = localStorage.getItem('operationLogs');
+            if (savedLogs) {
+                try {
+                    operationLogs = JSON.parse(savedLogs);
+                } catch (e) {
+                    console.error("解析操作日志失败，重置日志", e);
+                    operationLogs = [];
+                }
+            }
+            
+            // 设置当前日期
+            document.getElementById('scoreDate').valueAsDate = new Date();
+            
+            // 更新统计数据
+            updateStats();
+        }
+        
+        // 重置为初始数据
+        function resetToInitialData() {
+            employees.forEach(name => {
+                employeeData[name] = {
+                    score: Math.floor(Math.random() * 1000) + 500,
+                    coins: Math.floor(Math.random() * 800) + 300,
+                    visit1: Math.floor(Math.random() * 20) + 5,
+                    visit2: Math.floor(Math.random() * 15) + 3,
+                    sourceSign: Math.floor(Math.random() * 5) + 1,
+                    signerSign: Math.floor(Math.random() * 8) + 2,
+                    calls: Math.floor(Math.random() * 50) + 20,
+                    contractPlayCount: Math.floor(Math.random() * 10),
+                    totalVisits: 0,
+                    totalContracts: 0
+                };
+            });
+            saveData();
+        }
+        
+        // 保存数据
+        function saveData() {
+            try {
+                localStorage.setItem('employeeData', JSON.stringify(employeeData));
+                localStorage.setItem('operationLogs', JSON.stringify(operationLogs));
+                return true;
+            } catch (e) {
+                console.error("数据保存失败:", e);
+                showNotification("数据保存失败，请检查浏览器存储权限！", true);
+                return false;
+            }
+        }
+        
+        // 更新实时时钟
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const timeStr = now.toLocaleTimeString('zh-CN');
+            document.getElementById('clock').textContent = `${dateStr} ${timeStr}`;
+            setTimeout(updateClock, 1000);
+        }
+        
+        // 切换标签页
+        function switchTab(tabId) {
+            // 更新标签
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // 更新内容
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            document.getElementById(`${tabId}-pane`).classList.add('active');
+            
+            // 更新图表
+            updateCharts();
+        }
+        
+        // 更新统计数据
+        function updateStats() {
+            let totalVisits = 0;
+            let totalContracts = 0;
+            let totalScores = 0;
+            let totalCoins = 0;
+            
+            employees.forEach(name => {
+                totalVisits += employeeData[name].visit1 + employeeData[name].visit2;
+                totalContracts += employeeData[name].sourceSign + employeeData[name].signerSign;
+                totalScores += employeeData[name].score;
+                totalCoins += employeeData[name].coins;
+            });
+            
+            document.getElementById('totalVisits').textContent = totalVisits;
+            document.getElementById('totalContracts').textContent = totalContracts;
+            document.getElementById('totalScores').textContent = totalScores;
+            document.getElementById('totalCoins').textContent = totalCoins;
+        }
+        
+        // 生成排行榜
+        function generateRankings() {
+            // 积分排行榜
+            generateScoreRanking();
+            
+            // 电话量排行榜
+            generateCallRanking();
+            
+            // 进店量排行榜
+            generateVisitRanking();
+            
+            // 签单排行榜
+            generateContractRanking();
+            
+            // 更新统计数据
+            updateStats();
+        }
+        
+        // 生成积分排行榜
+        function generateScoreRanking() {
+            const tbody = document.getElementById('score-ranking');
+            tbody.innerHTML = '';
+            
+            // 准备数据并排序
+            const rankingData = employees.map(name => ({
+                name,
+                score: employeeData[name].score,
+                coins: employeeData[name].coins
+            })).sort((a, b) => b.score - a.score);
+            
+            // 生成表格行
+            rankingData.forEach((emp, index) => {
+                const row = document.createElement('tr');
+                
+                // 添加排名样式
+                if (index === 0) row.className = 'rank-1';
+                else if (index === 1) row.className = 'rank-2';
+                else if (index === 2) row.className = 'rank-3';
+                
+                // 排名列
+                const rankCell = document.createElement('td');
+                if (index === 0) rankCell.innerHTML = '<span class="medal">🥇</span> 1';
+                else if (index === 1) rankCell.innerHTML = '<span class="medal">🥈</span> 2';
+                else if (index === 2) rankCell.innerHTML = '<span class="medal">🥉</span> 3';
+                else rankCell.textContent = index + 1;
+                
+                // 姓名列
+                const nameCell = document.createElement('td');
+                nameCell.textContent = emp.name;
+                
+                // 积分列
+                const scoreCell = document.createElement('td');
+                scoreCell.textContent = emp.score;
+                
+                // 金币列
+                const coinsCell = document.createElement('td');
+                coinsCell.textContent = emp.coins;
+                
+                row.appendChild(rankCell);
+                row.appendChild(nameCell);
+                row.appendChild(scoreCell);
+                row.appendChild(coinsCell);
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 生成电话量排行榜
+        function generateCallRanking() {
+            const tbody = document.getElementById('call-ranking');
+            tbody.innerHTML = '';
+            
+            // 准备数据并排序
+            const rankingData = employees.map(name => ({
+                name,
+                calls: employeeData[name].calls
+            })).sort((a, b) => b.calls - a.calls);
+            
+            // 生成表格行
+            rankingData.forEach((emp, index) => {
+                const row = document.createElement('tr');
+                
+                // 添加排名样式
+                if (index === 0) row.className = 'rank-1';
+                else if (index === 1) row.className = 'rank-2';
+                else if (index === 2) row.className = 'rank-3';
+                
+                // 排名列
+                const rankCell = document.createElement('td');
+                if (index === 0) rankCell.innerHTML = '<span class="medal">🥇</span> 1';
+                else if (index === 1) rankCell.innerHTML = '<span class="medal">🥈</span> 2';
+                else if (index === 2) rankCell.innerHTML = '<span class="medal">🥉</span> 3';
+                else rankCell.textContent = index + 1;
+                
+                // 姓名列
+                const nameCell = document.createElement('td');
+                nameCell.textContent = emp.name;
+                
+                // 电话量列
+                const callsCell = document.createElement('td');
+                callsCell.textContent = emp.calls;
+                
+                row.appendChild(rankCell);
+                row.appendChild(nameCell);
+                row.appendChild(callsCell);
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 生成进店量排行榜
+        function generateVisitRanking() {
+            const tbody = document.getElementById('visit-ranking');
+            tbody.innerHTML = '';
+            
+            // 准备数据并排序
+            const rankingData = employees.map(name => ({
+                name,
+                visits: employeeData[name].visit1 + employeeData[name].visit2,
+                visit1: employeeData[name].visit1,
+                visit2: employeeData[name].visit2
+            })).sort((a, b) => b.visits - a.visits);
+            
+            // 生成表格行
+            rankingData.forEach((emp, index) => {
+                const row = document.createElement('tr');
+                
+                // 添加排名样式
+                if (index === 0) row.className = 'rank-1';
+                else if (index === 1) row.className = 'rank-2';
+                else if (index === 2) row.className = 'rank-3';
+                
+                // 排名列
+                const rankCell = document.createElement('td');
+                if (index === 0) rankCell.innerHTML = '<span class="medal">🥇</span> 1';
+                else if (index === 1) rankCell.innerHTML = '<span class="medal">🥈</span> 2';
+                else if (index === 2) rankCell.innerHTML = '<span class="medal">🥉</span> 3';
+                else rankCell.textContent = index + 1;
+                
+                // 姓名列
+                const nameCell = document.createElement('td');
+                nameCell.textContent = emp.name;
+                
+                // 总进店量列
+                const visitsCell = document.createElement('td');
+                visitsCell.textContent = emp.visits;
+                
+                // 一访列
+                const visit1Cell = document.createElement('td');
+                visit1Cell.textContent = emp.visit1;
+                
+                // 二访列
+                const visit2Cell = document.createElement('td');
+                visit2Cell.textContent = emp.visit2;
+                
+                row.appendChild(rankCell);
+                row.appendChild(nameCell);
+                row.appendChild(visitsCell);
+                row.appendChild(visit1Cell);
+                row.appendChild(visit2Cell);
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 生成签单排行榜
+        function generateContractRanking() {
+            const tbody = document.getElementById('contract-ranking');
+            tbody.innerHTML = '';
+            
+            // 计算签单总数 (来源方签单 + 签单手签单)
+            const rankingData = employees.map(name => ({
+                name,
+                contracts: employeeData[name].sourceSign + employeeData[name].signerSign,
+                coins: employeeData[name].coins
+            })).sort((a, b) => b.contracts - a.contracts);
+            
+            // 生成表格行
+            rankingData.forEach((emp, index) => {
+                const row = document.createElement('tr');
+                
+                // 添加排名样式
+                if (index === 0) row.className = 'rank-1';
+                else if (index === 1) row.className = 'rank-2';
+                else if (index === 2) row.className = 'rank-3';
+                
+                // 排名列
+                const rankCell = document.createElement('td');
+                if (index === 0) rankCell.innerHTML = '<span class="medal">🥇</span> 1';
+                else if (index === 1) rankCell.innerHTML = '<span class="medal">🥈</span> 2';
+                else if (index === 2) rankCell.innerHTML = '<span class="medal">🥉</span> 3';
+                else rankCell.textContent = index + 1;
+                
+                // 姓名列
+                const nameCell = document.createElement('td');
+                nameCell.textContent = emp.name;
+                
+                // 签单总数列
+                const contractsCell = document.createElement('td');
+                contractsCell.textContent = emp.contracts;
+                
+                // 金币列
+                const coinsCell = document.createElement('td');
+                coinsCell.textContent = emp.coins;
+                
+                row.appendChild(rankCell);
+                row.appendChild(nameCell);
+                row.appendChild(contractsCell);
+                row.appendChild(coinsCell);
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 更新图表
+        function updateCharts() {
+            updateScoreChart();
+            updateCallChart();
+            updateVisitChart();
+            updateContractChart();
+        }
+        
+        // 更新积分图表
+        function updateScoreChart() {
+            const ctx = document.getElementById('score-chart').getContext('2d');
+            
+            // 准备数据
+            const rankingData = employees.map(name => ({
+                name,
+                score: employeeData[name].score
+            })).sort((a, b) => b.score - a.score).slice(0, 10);
+            
+            const labels = rankingData.map(emp => emp.name);
+            const data = rankingData.map(emp => emp.score);
+            
+            if (scoreChart) {
+                scoreChart.destroy();
+            }
+            
+            scoreChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '积分',
+                        data: data,
+                        backgroundColor: '#1e88e5',
+                        borderColor: '#0d47a1',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '积分排行榜 TOP10',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '积分'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新电话量图表
+        function updateCallChart() {
+            const ctx = document.getElementById('call-chart').getContext('2d');
+            
+            // 准备数据
+            const rankingData = employees.map(name => ({
+                name,
+                calls: employeeData[name].calls
+            })).sort((a, b) => b.calls - a.calls).slice(0, 10);
+            
+            const labels = rankingData.map(emp => emp.name);
+            const data = rankingData.map(emp => emp.calls);
+            
+            if (callChart) {
+                callChart.destroy();
+            }
+            
+            callChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '电话量',
+                        data: data,
+                        backgroundColor: '#2196F3',
+                        borderColor: '#0D47A1',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '电话量排行榜 TOP10',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '电话量'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新进店量图表
+        function updateVisitChart() {
+            const ctx = document.getElementById('visit-chart').getContext('2d');
+            
+            // 准备数据
+            const rankingData = employees.map(name => ({
+                name,
+                visits: employeeData[name].visit1 + employeeData[name].visit2,
+                visit1: employeeData[name].visit1,
+                visit2: employeeData[name].visit2
+            })).sort((a, b) => b.visits - a.visits).slice(0, 10);
+            
+            const labels = rankingData.map(emp => emp.name);
+            const visit1Data = rankingData.map(emp => emp.visit1);
+            const visit2Data = rankingData.map(emp => emp.visit2);
+            
+            if (visitChart) {
+                visitChart.destroy();
+            }
+            
+            visitChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '一访',
+                            data: visit1Data,
+                            backgroundColor: '#FF9800'
+                        },
+                        {
+                            label: '二访',
+                            data: visit2Data,
+                            backgroundColor: '#FF5722'
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '进店量排行榜 TOP10',
+                            font: {
+                                size: 18
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '进店量'
+                            }
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新签单图表
+        function updateContractChart() {
+            const ctx = document.getElementById('contract-chart').getContext('2d');
+            
+            // 计算签单总数 (来源方签单 + 签单手签单)
+            const rankingData = employees.map(name => ({
+                name,
+                contracts: employeeData[name].sourceSign + employeeData[name].signerSign
+            })).sort((a, b) => b.contracts - a.contracts).slice(0, 10);
+            
+            const labels = rankingData.map(emp => emp.name);
+            const data = rankingData.map(emp => emp.contracts);
+            
+            if (contractChart) {
+                contractChart.destroy();
+            }
+            
+            contractChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '签单总数',
+                        data: data,
+                        backgroundColor: '#009688',
+                        borderColor: '#00796b',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '签单排行榜 TOP10',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '签单总数'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 打开添加/扣除积分模态框
+        function openAddScoreModal(actionType) {
+            currentActionType = actionType;
+            
+            const modal = document.getElementById('addScoreModal');
+            const header = document.getElementById('scoreModalHeader');
+            const actionBtn = document.getElementById('scoreActionBtn');
+            const reasonGroup = document.getElementById('deductReasonGroup');
+            const passwordField = document.getElementById('passwordField');
+            
+            if (actionType === 'add') {
+                header.textContent = '添加积分/电话量';
+                actionBtn.textContent = '确认添加';
+                actionBtn.className = 'btn btn-score';
+                reasonGroup.style.display = 'none';
+            } else {
+                header.textContent = '扣除积分';
+                actionBtn.textContent = '确认扣除';
+                actionBtn.className = 'btn btn-deduct';
+                reasonGroup.style.display = 'block';
+            }
+            
+            passwordField.style.display = 'block';
+            modal.style.display = 'flex';
+        }
+        
+        // 打开兑换金币模态框
+        function openRedeemModal() {
+            document.getElementById('redeemModal').style.display = 'flex';
+        }
+        
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 添加或扣除积分
+        function addScore() {
+            const employee = document.getElementById('employee').value;
+            const scoreType = document.getElementById('scoreType').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const password = document.getElementById('password').value;
+            const reason = document.getElementById('reason').value;
+            const scoreDate = document.getElementById('scoreDate').value;
+            
+            // 验证基础输入
+            if (!employee || !scoreType) {
+                showNotification('请选择员工和积分类型！', true);
+                return;
+            }
+            
+            // 验证密码
+            const now = new Date().getTime();
+            if (password !== PASSWORD) {
+                showNotification('密码错误！', true);
+                return;
+            }
+            
+            // 密码五分钟有效
+            if (now - lastPasswordTime > 5 * 60 * 1000) {
+                showNotification('密码已过期，请重新输入！', true);
+                return;
+            }
+            lastPasswordTime = now;
+            
+            // 验证数量
+            if (isNaN(quantity)) {
+                showNotification('请输入有效的数量！', true);
+                return;
+            }
+            
+            if (currentActionType === 'deduct' && !reason.trim()) {
+                showNotification('请填写扣除原因！', true);
+                return;
+            }
+            
+            // 根据类型处理数据修改
+            try {
+                if (scoreType === '抖音播放量') {
+                    // 抖音播放量特殊处理（每天仅一次）
+                    if (scoreDate !== new Date().toISOString().split('T')[0]) {
+                        employeeData[employee].contractPlayCount = 0;
+                    }
+                    
+                    if (quantity > 0) {
+                        employeeData[employee].contractPlayCount += quantity;
+                        employeeData[employee].score += quantity * scoreRules['抖音播放量'];
+                        employeeData[employee].coins += quantity * scoreRules['抖音播放量'];
+                    } else {
+                        employeeData[employee].contractPlayCount = Math.max(0, employeeData[employee].contractPlayCount - quantity);
+                        employeeData[employee].score -= quantity * scoreRules['抖音播放量'];
+                        employeeData[employee].coins -= quantity * scoreRules['抖音播放量'];
+                    }
+                } 
+                else if (scoreType === '单日最高积分') {
+                    // 单日最高积分特殊处理
+                    if (quantity > 0) {
+                        employeeData[employee].score += scoreRules['单日最高积分'];
+                        employeeData[employee].coins += scoreRules['单日最高积分'];
+                    } else {
+                        employeeData[employee].score -= scoreRules['单日最高积分'];
+                        employeeData[employee].coins -= scoreRules['单日最高积分'];
+                    }
+                } 
+                else if (scoreType === '电话量') {
+                    // 电话量直接加减
+                    employeeData[employee].calls += quantity;
+                    // 确保电话量不低于0
+                    employeeData[employee].calls = Math.max(0, employeeData[employee].calls);
+                } 
+                else {
+                    // 其他积分类型
+                    let pointsPerItem = 0;
+                    
+                    if (scoreType === '一访') pointsPerItem = scoreRules['一访'];
+                    else if (scoreType === '二访') pointsPerItem = scoreRules['二访'];
+                    else if (scoreType === '来源方签单') pointsPerItem = scoreRules['来源方签单'];
+                    else if (scoreType === '签单手签单') pointsPerItem = scoreRules['签单手签单'];
+                    
+                    const pointsToAdjust = pointsPerItem * quantity;
+                    
+                    if (currentActionType === 'add') {
+                        // 添加积分
+                        if (scoreType === '一访') {
+                            employeeData[employee].visit1 += quantity;
+                        } 
+                        else if (scoreType === '二访') {
+                            employeeData[employee].visit2 += quantity;
+                        }
+                        else if (scoreType === '来源方签单') {
+                            employeeData[employee].sourceSign += quantity;
+                        }
+                        else if (scoreType === '签单手签单') {
+                            employeeData[employee].signerSign += quantity;
+                        }
+                        
+                        employeeData[employee].score += pointsToAdjust;
+                        employeeData[employee].coins += pointsToAdjust;
+                    } else {
+                        // 扣除积分
+                        if (employeeData[employee].score < pointsToAdjust || 
+                            employeeData[employee].coins < pointsToAdjust) {
+                            showNotification(`扣除失败！${employee}的积分或金币不足。`, true);
+                            return;
+                        }
+                        
+                        if (scoreType === '一访') {
+                            employeeData[employee].visit1 = Math.max(0, employeeData[employee].visit1 - quantity);
+                        } 
+                        else if (scoreType === '二访') {
+                            employeeData[employee].visit2 = Math.max(0, employeeData[employee].visit2 - quantity);
+                        }
+                        else if (scoreType === '来源方签单') {
+                            employeeData[employee].sourceSign = Math.max(0, employeeData[employee].sourceSign - quantity);
+                        }
+                        else if (scoreType === '签单手签单') {
+                            employeeData[employee].signerSign = Math.max(0, employeeData[employee].signerSign - quantity);
+                        }
+                        
+                        employeeData[employee].score -= pointsToAdjust;
+                        employeeData[employee].coins -= pointsToAdjust;
+                        
+                        // 记录操作日志
+                        operationLogs.push({
+                            type: '扣除积分',
+                            employee,
+                            amount: pointsToAdjust,
+                            reason,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                }
+                
+                // 保存数据并更新界面
+                if (saveData()) {
+                    generateRankings();
+                    updateCharts();
+                    closeModal('addScoreModal');
+                    
+                    // 清空表单
+                    document.getElementById('quantity').value = 1;
+                    document.getElementById('password').value = '';
+                    document.getElementById('reason').value = '';
+                    
+                    showNotification('数据修改成功！');
+                } else {
+                    showNotification('数据保存失败，请重试！', true);
+                }
+            } catch (e) {
+                console.error("数据修改错误:", e);
+                showNotification('系统错误，请联系管理员！', true);
+            }
+        }
+        
+        // 兑换金币
+        function redeemCoins() {
+            const employee = document.getElementById('redeemEmployee').value;
+            const amount = parseInt(document.getElementById('amount').value);
+            const password = document.getElementById('redeemPassword').value;
+            
+            // 验证基础输入
+            if (!employee || isNaN(amount)) {
+                showNotification('请选择员工和有效兑换数量！', true);
+                return;
+            }
+            
+            // 验证密码
+            if (password !== PASSWORD) {
+                showNotification('密码错误！', true);
+                return;
+            }
+            
+            // 密码五分钟有效
+            const now = new Date().getTime();
+            if (now - lastPasswordTime > 5 * 60 * 1000) {
+                showNotification('密码已过期，请重新输入！', true);
+                return;
+            }
+            lastPasswordTime = now;
+            
+            // 验证金币余额
+            if (employeeData[employee].coins < amount) {
+                showNotification(`金币不足！当前金币余额: ${employeeData[employee].coins}`, true);
+                return;
+            }
+            
+            // 不满100金币不可兑换
+            if (employeeData[employee].coins < 100) {
+                showNotification('金币不足100，无法兑换！', true);
+                return;
+            }
+            
+            // 兑换金币（仅减少金币，不影响积分）
+            employeeData[employee].coins -= amount;
+            
+            // 保存数据并更新界面
+            if (saveData()) {
+                generateRankings();
+                updateCharts();
+                closeModal('redeemModal');
+                
+                // 清空表单
+                document.getElementById('amount').value = '';
+                document.getElementById('redeemPassword').value = '';
+                
+                showNotification(`已为 ${employee} 兑换 ${amount} 金币！`);
+            } else {
+                showNotification('数据保存失败，请重试！', true);
+            }
+        }
+        
+        // 导出图表
+        function exportChart(type) {
+            let chart, fileName;
+            
+            switch (type) {
+                case 'score':
+                    chart = scoreChart;
+                    fileName = '积分排行榜.png';
+                    break;
+                case 'call':
+                    chart = callChart;
+                    fileName = '电话量排行榜.png';
+                    break;
+                case 'visit':
+                    chart = visitChart;
+                    fileName = '进店量排行榜.png';
+                    break;
+                case 'contract':
+                    chart = contractChart;
+                    fileName = '签单排行榜.png';
+                    break;
+                default:
+                    return;
+            }
+            
+            if (!chart) {
+                showNotification('图表尚未生成！', true);
+                return;
+            }
+            
+            // 创建临时链接
+            const link = document.createElement('a');
+            link.href = chart.toBase64Image();
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification(`已导出 ${fileName} 图片！`);
+        }
+        
+        // 显示操作通知
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notificationText');
+            
+            text.textContent = message;
+            notification.className = 'notification';
+            
+            if (isError) {
+                notification.classList.add('error');
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 初始化页面
+        function initPage() {
+            initData();
+            updateClock();
+            generateRankings();
+            updateCharts();
+            
+            // 标签切换事件
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    switchTab(tab.dataset.tab);
+                });
+            });
+            
+            // 设置默认日期为今天
+            document.getElementById('scoreDate').valueAsDate = new Date();
+            
+            // 密码输入事件，记录最后一次输入密码的时间
+            document.getElementById('password').addEventListener('input', function() {
+                lastPasswordTime = new Date().getTime();
+            });
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
